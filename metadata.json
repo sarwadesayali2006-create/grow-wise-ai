@@ -1,0 +1,9 @@
+{
+  "name": "GrowWise – Smart Crop Decision System",
+  "description": "A digital advisor that helps farmers decide what crop to grow, monitor field health, detect crop diseases, and view weather forecasts using AI.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}
