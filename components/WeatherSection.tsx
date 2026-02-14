@@ -35,7 +35,6 @@ const WeatherSection: React.FC<WeatherSectionProps> = ({ language }) => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          // In a real app we'd reverse geocode this. For hackathon, we'll just indicate "Local Field"
           setLocation(`Nearby Field (${pos.coords.latitude.toFixed(2)}, ${pos.coords.longitude.toFixed(2)})`);
           setLoading(false);
         },
@@ -72,96 +71,103 @@ const WeatherSection: React.FC<WeatherSectionProps> = ({ language }) => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mb-4"></div>
-        <p className="text-slate-500 font-medium">{t.fetchingWeather}</p>
+      <div className="flex flex-col items-center justify-center py-24 bg-[#f9fbf9] rounded-[3rem] border border-emerald-50">
+        <div className="animate-spin rounded-full h-16 w-16 border-4 border-emerald-100 border-t-emerald-600 mb-6"></div>
+        <p className="text-emerald-800/40 font-black uppercase tracking-widest text-xs">{t.fetchingWeather}</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
+    <div className="space-y-10 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-          🌤️ {t.weatherForecast}
+        <h2 className="text-3xl font-black text-slate-900 flex items-center gap-3">
+          <span className="bg-emerald-100 p-2 rounded-2xl">🌤️</span> {t.weatherForecast}
         </h2>
-        <div className="bg-white px-4 py-2 rounded-full border border-slate-200 text-sm font-semibold text-slate-600 flex items-center gap-2 shadow-sm">
-          <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+        <div className="bg-[#f1f6f2] px-6 py-3 rounded-2xl border border-emerald-100 text-sm font-black text-emerald-800 flex items-center gap-3 shadow-inner uppercase tracking-tight">
+          <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
           {location}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         {/* Main Current Weather Card */}
-        <div className="lg:col-span-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl p-8 text-white shadow-xl shadow-emerald-100 flex flex-col md:flex-row items-center gap-10">
-          <div className="text-center md:text-left flex-grow">
-            <p className="text-emerald-100 font-bold uppercase tracking-widest text-xs mb-2">{t.currentCondition}</p>
-            <div className="flex items-center justify-center md:justify-start gap-4">
-              <span className="text-7xl">☀️</span>
+        <div className="lg:col-span-2 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-[3rem] p-10 text-white shadow-2xl shadow-emerald-200 flex flex-col md:flex-row items-center gap-12 relative overflow-hidden group">
+          <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mb-32 blur-3xl transition-all duration-700 group-hover:bg-white/10"></div>
+          
+          <div className="text-center md:text-left flex-grow relative z-10">
+            <p className="text-emerald-100 font-black uppercase tracking-[0.2em] text-[10px] mb-4 drop-shadow-sm">{t.currentCondition}</p>
+            <div className="flex items-center justify-center md:justify-start gap-6">
+              <span className="text-8xl drop-shadow-xl filter saturate-150">☀️</span>
               <div>
-                <h3 className="text-6xl font-black">32°C</h3>
-                <p className="text-xl font-medium text-emerald-50">{language === 'hi' ? 'धूप' : 'Sunny'}</p>
+                <h3 className="text-8xl font-black tracking-tighter">32°C</h3>
+                <p className="text-2xl font-black text-emerald-50 uppercase tracking-widest">{language === 'hi' ? 'धूप' : 'Sunny'}</p>
               </div>
             </div>
             
-            <div className="mt-8 grid grid-cols-2 gap-4">
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
-                <p className="text-[10px] text-emerald-100 font-bold uppercase mb-1">{t.humidity}</p>
-                <p className="text-xl font-bold">45%</p>
+            <div className="mt-10 grid grid-cols-2 gap-6">
+              <div className="bg-white/10 backdrop-blur-xl rounded-[2rem] p-6 border border-white/20 shadow-xl transition-all hover:bg-white/15">
+                <p className="text-[10px] text-emerald-200 font-black uppercase tracking-widest mb-2">{t.humidity}</p>
+                <p className="text-3xl font-black">45%</p>
               </div>
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
-                <p className="text-[10px] text-emerald-100 font-bold uppercase mb-1">{t.windSpeed}</p>
-                <p className="text-xl font-bold">12 km/h</p>
+              <div className="bg-white/10 backdrop-blur-xl rounded-[2rem] p-6 border border-white/20 shadow-xl transition-all hover:bg-white/15">
+                <p className="text-[10px] text-emerald-200 font-black uppercase tracking-widest mb-2">{t.windSpeed}</p>
+                <p className="text-3xl font-black">12 <span className="text-sm font-bold opacity-60">km/h</span></p>
               </div>
             </div>
           </div>
 
-          <div className="flex-shrink-0 w-full md:w-auto">
-            <h4 className="font-bold mb-4 text-emerald-100 text-sm uppercase tracking-wider">{t.weeklyOutlook}</h4>
-            <div className="space-y-3">
-              {forecast.map((f, i) => (
-                <div key={i} className="flex items-center justify-between gap-8 bg-white/5 p-2 px-4 rounded-xl border border-white/5">
-                  <span className="font-bold text-sm w-10">{f.day}</span>
-                  <span className="text-xl">{f.icon}</span>
-                  <span className="font-black text-sm">{f.temp}°</span>
-                </div>
-              ))}
+          <div className="flex-shrink-0 w-full md:w-auto relative z-10">
+            <div className="bg-black/10 backdrop-blur-md rounded-[2.5rem] p-8 border border-white/10 shadow-2xl">
+              <h4 className="font-black mb-6 text-emerald-100 text-xs uppercase tracking-widest border-b border-white/10 pb-3">{t.weeklyOutlook}</h4>
+              <div className="space-y-4">
+                {forecast.map((f, i) => (
+                  <div key={i} className="flex items-center justify-between gap-10 hover:translate-x-1 transition-all">
+                    <span className="font-black text-sm w-12 text-emerald-100">{f.day}</span>
+                    <span className="text-2xl filter drop-shadow-sm">{f.icon}</span>
+                    <span className="font-black text-lg w-12 text-right">{f.temp}°</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
         {/* AI Weather Advisor Card */}
-        <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 flex flex-col">
-          <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-            🧠 {t.agriInsight}
+        <div className="bg-[#f9fbf9] rounded-[3rem] p-10 shadow-sm border border-emerald-50 flex flex-col group">
+          <h3 className="text-2xl font-black text-slate-800 mb-4 flex items-center gap-3">
+            <span className="text-emerald-600">🧠</span> {t.agriInsight}
           </h3>
-          <p className="text-xs text-slate-500 mb-6 leading-relaxed">
-            {language === 'hi' ? 'हम आपके स्थानीय मौसम का विश्लेषण करते हैं ताकि आपको खेती के सही निर्णय लेने में मदद मिल सके।' : 'We analyze your local weather to help you make precise farming decisions.'}
+          <p className="text-[11px] font-bold text-slate-400 mb-8 leading-relaxed uppercase tracking-wider">
+            {language === 'hi' ? 'स्थानीय मौसम विश्लेषण' : 'Advanced Local Data Synthesis'}
           </p>
 
-          <div className="flex-grow bg-slate-50 rounded-2xl p-4 border border-slate-100 mb-6 min-h-[150px] relative overflow-hidden">
-            {isGeneratingAdvice ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/50 backdrop-blur-sm z-10">
-                <div className="animate-spin h-6 w-6 border-b-2 border-emerald-600 mb-2"></div>
-                <p className="text-[10px] font-bold text-emerald-700">Consulting Gemini...</p>
+          <div className="flex-grow bg-white rounded-[2rem] p-6 border border-emerald-100/50 mb-8 min-h-[180px] relative overflow-hidden shadow-inner">
+            {isGeneratingAdvice && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/60 backdrop-blur-md z-10 animate-in fade-in duration-300">
+                <div className="relative">
+                  <div className="animate-spin h-10 w-10 border-4 border-emerald-100 border-t-emerald-600 rounded-full"></div>
+                </div>
+                <p className="text-[10px] font-black text-emerald-700 uppercase tracking-widest mt-4">Consulting Gemini...</p>
               </div>
-            ) : null}
+            )}
             
             {advice ? (
-              <p className="text-sm text-slate-700 whitespace-pre-line animate-in fade-in slide-in-from-bottom-2">
+              <p className="text-sm font-medium text-slate-700 leading-relaxed animate-in fade-in slide-in-from-bottom-2 italic">
                 {advice}
               </p>
             ) : (
-              <p className="text-sm text-slate-400 italic text-center py-10">
-                {t.weatherAdvicePlaceholder}
-              </p>
+              <div className="h-full flex flex-col items-center justify-center text-slate-300 space-y-4 py-6">
+                <div className="text-5xl opacity-20">🍃</div>
+                <p className="text-xs font-bold text-center italic">{t.weatherAdvicePlaceholder}</p>
+              </div>
             )}
           </div>
 
           <button 
             onClick={generateWeatherAdvice}
             disabled={isGeneratingAdvice}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-100 transition-all flex items-center justify-center gap-2"
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-5 rounded-2xl shadow-xl shadow-emerald-500/10 transition-all flex items-center justify-center gap-3 active:scale-95 text-lg"
           >
             🪄 {t.analyze}
           </button>
@@ -169,12 +175,15 @@ const WeatherSection: React.FC<WeatherSectionProps> = ({ language }) => {
       </div>
       
       {/* Visual Recommendation Banner */}
-      <div className="bg-blue-600 rounded-3xl p-6 text-white flex items-center gap-6 shadow-xl shadow-blue-100 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-        <div className="text-4xl">🚜</div>
-        <div>
-          <h4 className="font-bold text-lg">{language === 'hi' ? 'खेत की तैयारी के लिए अनुकूल' : 'Favorable for Tilling'}</h4>
-          <p className="text-blue-100 text-sm">Low precipitation and mild winds make today ideal for field preparation.</p>
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-[2.5rem] p-8 text-white flex flex-col md:flex-row items-center gap-8 shadow-2xl shadow-blue-100 relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl group-hover:scale-125 transition-all duration-1000"></div>
+        <div className="text-6xl bg-white/10 p-4 rounded-3xl backdrop-blur-md border border-white/10 shadow-inner">🚜</div>
+        <div className="text-center md:text-left">
+          <h4 className="font-black text-2xl tracking-tighter uppercase mb-2">{language === 'hi' ? 'खेत की तैयारी के लिए अनुकूल' : 'Favorable for Tilling'}</h4>
+          <p className="text-blue-100 text-lg font-medium max-w-2xl leading-tight">Low precipitation and mild winds make today ideal for field preparation and soil conditioning.</p>
+        </div>
+        <div className="md:ml-auto">
+          <span className="bg-white text-blue-700 font-black px-6 py-3 rounded-2xl shadow-xl uppercase tracking-widest text-sm">Actionable</span>
         </div>
       </div>
     </div>

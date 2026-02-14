@@ -184,18 +184,18 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ language: initialLangua
   };
 
   return (
-    <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 animate-in fade-in duration-500">
-      <div className="flex flex-col items-center text-center space-y-6">
+    <div className="bg-[#f9fbf9] rounded-[3rem] p-10 shadow-sm border border-emerald-50 animate-in fade-in duration-500">
+      <div className="flex flex-col items-center text-center space-y-8">
         
         {/* Language Selection Toggle */}
-        <div className="flex items-center bg-slate-100 p-1 rounded-xl w-fit">
+        <div className="flex items-center bg-[#f1f6f2] p-1.5 rounded-2xl border border-emerald-50 shadow-inner">
           <button 
             disabled={isActive}
             onClick={() => setVoiceLanguage('en')}
-            className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
+            className={`px-6 py-2 rounded-xl text-xs font-black transition-all uppercase tracking-widest ${
               voiceLanguage === 'en' 
-                ? 'bg-white text-emerald-600 shadow-sm' 
-                : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-emerald-600 text-white shadow-lg' 
+                : 'text-emerald-700/60 hover:text-emerald-800'
             } ${isActive ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             English
@@ -203,10 +203,10 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ language: initialLangua
           <button 
             disabled={isActive}
             onClick={() => setVoiceLanguage('hi')}
-            className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
+            className={`px-6 py-2 rounded-xl text-xs font-black transition-all uppercase tracking-widest ${
               voiceLanguage === 'hi' 
-                ? 'bg-white text-emerald-600 shadow-sm' 
-                : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-emerald-600 text-white shadow-lg' 
+                : 'text-emerald-700/60 hover:text-emerald-800'
             } ${isActive ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             हिन्दी
@@ -214,10 +214,10 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ language: initialLangua
         </div>
 
         <div className="relative">
-          <div className={`absolute inset-0 bg-emerald-500 rounded-full opacity-20 blur-xl transition-all duration-1000 ${isActive ? 'animate-pulse scale-150' : 'scale-0'}`}></div>
+          <div className={`absolute inset-0 bg-emerald-500 rounded-full opacity-20 blur-3xl transition-all duration-1000 ${isActive ? 'animate-pulse scale-150' : 'scale-0'}`}></div>
           <button 
             onClick={isActive ? stopConversation : startConversation}
-            className={`relative z-10 w-24 h-24 rounded-full flex items-center justify-center text-4xl shadow-2xl transition-all active:scale-95 ${
+            className={`relative z-10 w-32 h-32 rounded-full flex items-center justify-center text-5xl shadow-2xl transition-all active:scale-90 ${
               isActive ? 'bg-red-500 text-white animate-bounce' : 'bg-emerald-600 text-white hover:bg-emerald-700'
             }`}
           >
@@ -226,30 +226,30 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ language: initialLangua
         </div>
 
         <div>
-          <h2 className="text-2xl font-black text-slate-800">{t.voiceAssistantTitle}</h2>
-          <p className="text-slate-500 mt-1">{t.voiceInstruction}</p>
-          <p className="text-xs font-semibold text-emerald-600 mt-1 uppercase tracking-wider">
+          <h2 className="text-3xl font-black text-slate-800 tracking-tighter">{t.voiceAssistantTitle}</h2>
+          <p className="text-slate-500 mt-2 font-medium">{t.voiceInstruction}</p>
+          <p className="text-[10px] font-black text-emerald-600 mt-3 uppercase tracking-[0.2em] bg-emerald-100 px-4 py-1.5 rounded-full inline-block">
             {voiceLanguage === 'en' ? 'Mode: English' : 'मोड: हिंदी'}
           </p>
         </div>
 
-        <div className="w-full max-w-md bg-slate-50 rounded-2xl p-6 min-h-[120px] flex flex-col justify-center border border-slate-100">
+        <div className="w-full max-w-lg bg-white rounded-[2.5rem] p-8 min-h-[160px] flex flex-col justify-center border border-emerald-50 shadow-inner">
           {!isActive ? (
-            <p className="text-slate-400 italic">{t.voiceStart}</p>
+            <p className="text-emerald-800/20 italic font-black text-lg">{t.voiceStart}</p>
           ) : (
-            <div className="space-y-2 text-left">
+            <div className="space-y-4 text-left">
               {transcript.length === 0 && (
-                <div className="flex items-center gap-2 text-emerald-600 font-bold justify-center">
-                  <div className="flex gap-1">
-                    <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-bounce"></span>
-                    <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-bounce [animation-delay:0.2s]"></span>
-                    <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                <div className="flex items-center gap-3 text-emerald-600 font-black justify-center">
+                  <div className="flex gap-1.5">
+                    <span className="w-2 h-2 bg-emerald-600 rounded-full animate-bounce"></span>
+                    <span className="w-2 h-2 bg-emerald-600 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                    <span className="w-2 h-2 bg-emerald-600 rounded-full animate-bounce [animation-delay:0.4s]"></span>
                   </div>
-                  <span>{isSpeaking ? t.voiceSpeaking : t.voiceListening}</span>
+                  <span className="uppercase tracking-widest text-xs">{isSpeaking ? t.voiceSpeaking : t.voiceListening}</span>
                 </div>
               )}
               {transcript.map((line, i) => (
-                <p key={i} className={`text-sm ${line.startsWith('You') ? 'text-slate-500 italic' : 'text-emerald-700 font-semibold'}`}>
+                <p key={i} className={`text-base leading-relaxed ${line.startsWith('You') ? 'text-slate-400 font-medium italic' : 'text-emerald-800 font-black'}`}>
                   {line}
                 </p>
               ))}
@@ -260,7 +260,7 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ language: initialLangua
         {isActive && (
           <button 
             onClick={stopConversation}
-            className="text-sm font-bold text-red-500 hover:underline"
+            className="text-xs font-black text-red-500 hover:text-red-700 uppercase tracking-widest transition-all"
           >
             {t.voiceStop}
           </button>

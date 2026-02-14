@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   BarChart, 
   Bar, 
@@ -19,13 +19,14 @@ import FieldMonitoring from './components/FieldMonitoring';
 import DiseaseDetection from './components/DiseaseDetection';
 import VoiceAssistant from './components/VoiceAssistant';
 import WeatherSection from './components/WeatherSection';
+import PersonalRecommendation from './components/PersonalRecommendation';
 import Login from './components/Login';
-import { UserInputs, RecommendationResult } from './types';
+import { UserInputs, RecommendationResult, FarmReminder } from './types';
 import { CROPS_DATA } from './data';
 import { getRecommendations } from './utils';
 import { translations, Language } from './translations';
 
-type ActiveTab = 'advisor' | 'monitor' | 'disease' | 'assistant' | 'weather';
+type ActiveTab = 'advisor' | 'monitor' | 'disease' | 'assistant' | 'weather' | 'personal' | 'notifications';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -38,6 +39,7 @@ const App: React.FC = () => {
     landSize: 10
   });
 
+  const [reminders, setReminders] = useState<FarmReminder[]>([]);
   const t = translations[language];
 
   const [recommendations, setRecommendations] = useState<RecommendationResult[]>([]);
@@ -54,6 +56,20 @@ const App: React.FC = () => {
     setIsLoggedIn(false);
     setHasSearched(false);
   };
+
+  const addReminder = (reminder: FarmReminder) => {
+    setReminders(prev => [...prev, reminder]);
+  };
+
+  const toggleReminder = (id: string) => {
+    setReminders(prev => prev.map(r => r.id === id ? { ...r, isCompleted: !r.isCompleted } : r));
+  };
+
+  const deleteReminder = (id: string) => {
+    setReminders(prev => prev.filter(r => r.id !== id));
+  };
+
+  const activeRemindersCount = reminders.filter(r => !r.isCompleted).length;
 
   const topThree = useMemo(() => recommendations.slice(0, 3), [recommendations]);
   const bestCrop = topThree[0];
@@ -79,7 +95,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-slate-50 animate-in fade-in duration-500">
+    <div className="flex flex-col md:flex-row min-h-screen bg-[#fcfdfa] animate-in fade-in duration-500">
       {/* Sidebar for Inputs */}
       <aside className="w-full md:w-80 lg:w-96 flex-shrink-0">
         <Sidebar 
@@ -94,152 +110,167 @@ const App: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="flex-grow p-4 md:p-8 overflow-y-auto">
-        {/* Navigation Tabs */}
-        <div className="flex flex-wrap gap-2 md:gap-4 mb-8 bg-white p-1.5 rounded-2xl border border-slate-200 w-fit">
+        {/* Navigation Tabs + Notification Center */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-10">
+          <div className="flex flex-wrap gap-2 md:gap-4 bg-[#f1f6f2] p-2 rounded-3xl border border-emerald-100/50 w-fit shadow-inner">
+            <button 
+              onClick={() => setActiveTab('advisor')}
+              className={`px-5 py-3 rounded-2xl font-black transition-all text-xs md:text-sm uppercase tracking-wider ${activeTab === 'advisor' ? 'bg-emerald-600 text-white shadow-xl scale-105' : 'text-emerald-700/60 hover:bg-emerald-100/50'}`}
+            >
+              🌾 {t.navAdvisor}
+            </button>
+            <button 
+              onClick={() => setActiveTab('personal')}
+              className={`px-5 py-3 rounded-2xl font-black transition-all text-xs md:text-sm uppercase tracking-wider ${activeTab === 'personal' ? 'bg-emerald-600 text-white shadow-xl scale-105' : 'text-emerald-700/60 hover:bg-emerald-100/50'}`}
+            >
+              🎯 {t.navPersonal}
+            </button>
+            <button 
+              onClick={() => setActiveTab('monitor')}
+              className={`px-5 py-3 rounded-2xl font-black transition-all text-xs md:text-sm uppercase tracking-wider ${activeTab === 'monitor' ? 'bg-emerald-600 text-white shadow-xl scale-105' : 'text-emerald-700/60 hover:bg-emerald-100/50'}`}
+            >
+              📊 {t.navMonitoring}
+            </button>
+            <button 
+              onClick={() => setActiveTab('disease')}
+              className={`px-5 py-3 rounded-2xl font-black transition-all text-xs md:text-sm uppercase tracking-wider ${activeTab === 'disease' ? 'bg-emerald-600 text-white shadow-xl scale-105' : 'text-emerald-700/60 hover:bg-emerald-100/50'}`}
+            >
+              🔍 {t.navDetection}
+            </button>
+          </div>
+
           <button 
-            onClick={() => setActiveTab('advisor')}
-            className={`px-4 py-2 rounded-xl font-bold transition-all text-xs md:text-sm ${activeTab === 'advisor' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}
+            onClick={() => setActiveTab('notifications')}
+            className={`relative p-4 rounded-3xl transition-all shadow-lg ${activeTab === 'notifications' ? 'bg-slate-900 text-white scale-110' : 'bg-white text-slate-800 hover:bg-emerald-50 border border-emerald-50'}`}
           >
-            🌾 {t.navAdvisor}
-          </button>
-          <button 
-            onClick={() => setActiveTab('monitor')}
-            className={`px-4 py-2 rounded-xl font-bold transition-all text-xs md:text-sm ${activeTab === 'monitor' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}
-          >
-            📊 {t.navMonitoring}
-          </button>
-          <button 
-            onClick={() => setActiveTab('disease')}
-            className={`px-4 py-2 rounded-xl font-bold transition-all text-xs md:text-sm ${activeTab === 'disease' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}
-          >
-            🔍 {t.navDetection}
-          </button>
-          <button 
-            onClick={() => setActiveTab('weather')}
-            className={`px-4 py-2 rounded-xl font-bold transition-all text-xs md:text-sm ${activeTab === 'weather' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}
-          >
-            🌤️ {t.navWeather}
-          </button>
-          <button 
-            onClick={() => setActiveTab('assistant')}
-            className={`px-4 py-2 rounded-xl font-bold transition-all text-xs md:text-sm ${activeTab === 'assistant' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}
-          >
-            🎙️ {t.navAssistant}
+            <span className="text-2xl">{activeRemindersCount > 0 ? '🔔' : '🔕'}</span>
+            {activeRemindersCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-black w-6 h-6 rounded-full flex items-center justify-center border-4 border-white animate-bounce">
+                {activeRemindersCount}
+              </span>
+            )}
           </button>
         </div>
 
         {/* Dynamic Header */}
         <div className="mb-10">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-4xl">
-              {activeTab === 'advisor' ? '🌾' : activeTab === 'monitor' ? '🛰️' : activeTab === 'disease' ? '🧠' : activeTab === 'weather' ? '🌤️' : '🤖'}
+          <div className="flex items-center gap-4 mb-3">
+            <span className="text-5xl bg-emerald-100 p-3 rounded-[2rem] shadow-sm transform hover:rotate-6 transition-transform">
+              {activeTab === 'advisor' ? '🌾' : activeTab === 'personal' ? '🎯' : activeTab === 'monitor' ? '🛰️' : activeTab === 'disease' ? '🧠' : activeTab === 'notifications' ? '📋' : activeTab === 'weather' ? '🌤️' : '🤖'}
             </span>
-            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-              {t.title} – <span className="text-emerald-600">
-                {activeTab === 'advisor' ? t.subtitle : activeTab === 'monitor' ? t.navMonitoring : activeTab === 'disease' ? t.navDetection : activeTab === 'weather' ? t.weatherForecast : t.navAssistant}
-              </span>
-            </h1>
+            <div>
+              <h1 className="text-4xl font-black text-slate-900 tracking-tighter">
+                {t.title} <span className="text-emerald-600">/ {activeTab === 'advisor' ? t.subtitle : activeTab === 'personal' ? t.navPersonal : activeTab === 'monitor' ? t.navMonitoring : activeTab === 'disease' ? t.navDetection : activeTab === 'notifications' ? t.reminders : activeTab === 'weather' ? t.weatherForecast : t.navAssistant}</span>
+              </h1>
+              <p className="text-slate-500 text-lg font-medium max-w-2xl mt-1">
+                {activeTab === 'notifications' ? t.activeNotifications : t.description}
+              </p>
+            </div>
           </div>
-          <p className="text-slate-600 text-lg">
-            {t.description}
-          </p>
         </div>
 
         {/* Content Router */}
-        {activeTab === 'advisor' && (
-          <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-            {!hasSearched ? (
-              <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border-2 border-dashed border-slate-200">
-                <div className="text-6xl mb-6 opacity-40">🚜</div>
-                <h2 className="text-2xl font-bold text-slate-400">{t.readyToStart}</h2>
-                <p className="text-slate-400 mt-2">{t.configureLand}</p>
-              </div>
-            ) : (
-              <div className="space-y-10">
-                {bestCrop && (
-                  <div className="bg-emerald-600 rounded-3xl p-8 text-white shadow-xl shadow-emerald-200 flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div className="flex-grow">
-                      <p className="text-emerald-100 font-bold uppercase tracking-widest text-xs mb-2">{t.topRecommended}</p>
-                      <h2 className="text-5xl font-black mb-4">{bestCrop.name}</h2>
-                      <div className="flex flex-wrap gap-4">
-                        <div className="bg-emerald-500/30 px-4 py-2 rounded-xl backdrop-blur-sm border border-emerald-400/20">
-                          <p className="text-[10px] text-emerald-100 uppercase font-bold">{t.totalScore}</p>
-                          <p className="text-2xl font-bold">{bestCrop.score} pts</p>
-                        </div>
-                        <div className="bg-emerald-500/30 px-4 py-2 rounded-xl backdrop-blur-sm border border-emerald-400/20">
-                          <p className="text-[10px] text-emerald-100 uppercase font-bold">{t.estRevenue}</p>
-                          <p className="text-2xl font-bold">₹{bestCrop.expectedRevenue.toLocaleString()}</p>
+        <div className="perspective-1000">
+          {activeTab === 'advisor' && (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+              {/* ... (advisor content unchanged) ... */}
+              {!hasSearched ? (
+                <div className="flex flex-col items-center justify-center py-24 bg-[#f9fbf9] rounded-[3rem] border-4 border-dashed border-emerald-100 shadow-inner">
+                  <div className="text-8xl mb-8 opacity-20 transform -rotate-12 animate-float">🚜</div>
+                  <h2 className="text-3xl font-black text-emerald-900/40 uppercase tracking-tighter">{t.readyToStart}</h2>
+                  <p className="text-emerald-700/30 mt-3 font-bold text-center max-w-md">{t.configureLand}</p>
+                </div>
+              ) : (
+                <div className="space-y-12">
+                  {bestCrop && (
+                    <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-[3rem] p-10 text-white shadow-2xl shadow-emerald-200 flex flex-col md:flex-row items-center justify-between gap-10 relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-48 -mt-48 transition-all duration-700 group-hover:scale-110"></div>
+                      <div className="relative z-10 flex-grow">
+                        <p className="text-emerald-100 font-black uppercase tracking-[0.2em] text-xs mb-3">{t.topRecommended}</p>
+                        <h2 className="text-6xl font-black mb-6 tracking-tighter">{bestCrop.name}</h2>
+                        <div className="flex flex-wrap gap-6">
+                          <div className="bg-white/10 px-6 py-4 rounded-[1.5rem] backdrop-blur-md border border-white/20 shadow-xl">
+                            <p className="text-[10px] text-emerald-100 uppercase font-black tracking-widest mb-1">{t.totalScore}</p>
+                            <p className="text-3xl font-black">{bestCrop.score} <span className="text-sm opacity-60">pts</span></p>
+                          </div>
+                          <div className="bg-white/10 px-6 py-4 rounded-[1.5rem] backdrop-blur-md border border-white/20 shadow-xl">
+                            <p className="text-[10px] text-emerald-100 uppercase font-black tracking-widest mb-1">{t.estRevenue}</p>
+                            <p className="text-3xl font-black">₹{bestCrop.expectedRevenue.toLocaleString()}</p>
+                          </div>
                         </div>
                       </div>
+                      <div className="relative z-10 flex-shrink-0 text-center md:text-right">
+                        <div className="text-9xl mb-4 drop-shadow-2xl filter saturate-150 animate-float">🏆</div>
+                        <p className="text-emerald-50 text-xl font-black uppercase tracking-widest">{t.bestFit}</p>
+                      </div>
                     </div>
-                    <div className="flex-shrink-0 text-center md:text-right">
-                      <div className="text-7xl mb-2">🏆</div>
-                      <p className="text-emerald-100 text-sm font-medium">{t.bestFit}</p>
+                  )}
+
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-900 mb-8 flex items-center gap-3">
+                      <span className="bg-emerald-100 p-2 rounded-xl">📋</span> {t.detailedRecommendations}
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                      {topThree.map((crop, idx) => (
+                        <RecommendationCard key={crop.id} crop={crop} rank={idx + 1} language={language} />
+                      ))}
                     </div>
                   </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'personal' && <PersonalRecommendation language={language} onAddReminder={addReminder} />}
+          {activeTab === 'monitor' && <FieldMonitoring language={language} />}
+          {activeTab === 'disease' && <DiseaseDetection language={language} />}
+          {activeTab === 'weather' && <WeatherSection language={language} />}
+          {activeTab === 'assistant' && <VoiceAssistant language={language} />}
+          
+          {activeTab === 'notifications' && (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {reminders.length === 0 ? (
+                  <div className="col-span-full py-20 bg-[#f9fbf9] rounded-[3rem] border-4 border-dashed border-emerald-100 flex flex-col items-center justify-center text-center px-10">
+                    <span className="text-7xl mb-6 opacity-20">📭</span>
+                    <h3 className="text-2xl font-black text-slate-400 uppercase tracking-tighter">{t.noNotifications}</h3>
+                  </div>
+                ) : (
+                  reminders.map(reminder => (
+                    <div 
+                      key={reminder.id} 
+                      className={`bg-[#f9fbf9] p-8 rounded-[2.5rem] shadow-xl border border-emerald-50 transition-all duration-500 hover:rotate-x-6 hover:-translate-y-2 preserve-3d group ${reminder.isCompleted ? 'opacity-50 grayscale' : ''}`}
+                    >
+                      <div className="flex items-start justify-between mb-6">
+                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-2xl shadow-inner border border-emerald-50">
+                          {reminder.type === 'irrigation' ? '💧' : reminder.type === 'fertilizer' ? '🧪' : reminder.type === 'harvest' ? '🧺' : '📅'}
+                        </div>
+                        <span className="text-[10px] font-black text-emerald-600 bg-white px-3 py-1.5 rounded-full shadow-sm uppercase tracking-widest border border-emerald-50">
+                          {reminder.time}
+                        </span>
+                      </div>
+                      <h4 className={`text-xl font-black text-slate-800 mb-4 ${reminder.isCompleted ? 'line-through' : ''}`}>{reminder.task}</h4>
+                      <div className="flex gap-3">
+                        <button 
+                          onClick={() => toggleReminder(reminder.id)}
+                          className={`flex-grow py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${reminder.isCompleted ? 'bg-slate-200 text-slate-500' : 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 hover:bg-emerald-700'}`}
+                        >
+                          {reminder.isCompleted ? 'Undo' : t.taskCompleted}
+                        </button>
+                        <button 
+                          onClick={() => deleteReminder(reminder.id)}
+                          className="px-5 rounded-xl bg-red-50 text-red-500 border border-red-100 hover:bg-red-500 hover:text-white transition-all"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                  ))
                 )}
-
-                <div>
-                  <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                    📋 {t.detailedRecommendations}
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {topThree.map((crop, idx) => (
-                      <RecommendationCard key={crop.id} crop={crop} rank={idx + 1} language={language} />
-                    ))}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200">
-                    <h2 className="text-xl font-bold text-slate-800 mb-8 flex items-center gap-2">
-                      📊 {t.scoreAnalysis}
-                    </h2>
-                    <div className="h-[300px] w-full">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={topThree} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }} />
-                          <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
-                          <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', padding: '12px' }} />
-                          <Bar dataKey="score" radius={[8, 8, 0, 0]} barSize={50}>
-                            {topThree.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={index === 0 ? '#10b981' : '#94a3b8'} />
-                            ))}
-                          </Bar>
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </div>
-
-                  <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200">
-                    <h2 className="text-xl font-bold text-slate-800 mb-8 flex items-center gap-2">
-                      🥧 {t.marketPotentialDistribution}
-                    </h2>
-                    <div className="h-[300px] w-full">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie data={pieData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
-                            {pieData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                            ))}
-                          </Pie>
-                          <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                          <Legend verticalAlign="bottom" height={36} iconType="circle" />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </div>
-                </div>
               </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'monitor' && <FieldMonitoring language={language} />}
-        {activeTab === 'disease' && <DiseaseDetection language={language} />}
-        {activeTab === 'weather' && <WeatherSection language={language} />}
-        {activeTab === 'assistant' && <VoiceAssistant language={language} />}
+            </div>
+          )}
+        </div>
       </main>
     </div>
   );

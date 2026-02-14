@@ -57,27 +57,27 @@ const DiseaseDetection: React.FC<DiseaseDetectionProps> = ({ language }) => {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-        🔍 {t.diseaseDetection}
+    <div className="space-y-10 animate-in fade-in duration-500">
+      <h2 className="text-3xl font-black text-slate-900 flex items-center gap-3">
+        <span className="bg-emerald-100 p-2 rounded-2xl">🔍</span> {t.diseaseDetection}
       </h2>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 flex flex-col items-center justify-center text-center">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <div className="bg-[#f9fbf9] p-10 rounded-[3rem] shadow-sm border border-emerald-50 flex flex-col items-center justify-center text-center group">
           {image ? (
-            <div className="relative w-full group">
-              <img src={image} alt="Selected" className="max-h-80 w-full object-cover rounded-2xl mb-6 shadow-lg" />
+            <div className="relative w-full overflow-hidden rounded-[2.5rem] shadow-2xl mb-8 group-hover:scale-[1.02] transition-all duration-500">
+              <img src={image} alt="Selected" className="max-h-96 w-full object-cover" />
               <button 
                 onClick={() => setImage(null)}
-                className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-4 right-4 bg-red-500/80 backdrop-blur-md text-white p-3 rounded-full hover:bg-red-600 transition-all shadow-xl"
               >
                 ✕
               </button>
             </div>
           ) : (
-            <div className="border-4 border-dashed border-slate-100 rounded-3xl p-12 w-full mb-6">
-              <span className="text-6xl mb-4 block">📸</span>
-              <p className="text-slate-400 font-medium">{t.uploadPrompt}</p>
+            <div className="border-4 border-dashed border-emerald-100 bg-white/50 rounded-[3rem] p-16 w-full mb-8 flex flex-col items-center justify-center group-hover:border-emerald-300 transition-all duration-500">
+              <span className="text-8xl mb-6 block animate-bounce [animation-duration:3s]">📸</span>
+              <p className="text-emerald-800/40 font-black uppercase tracking-widest text-sm">{t.uploadPrompt}</p>
             </div>
           )}
           
@@ -91,7 +91,7 @@ const DiseaseDetection: React.FC<DiseaseDetectionProps> = ({ language }) => {
           />
           <label 
             htmlFor="imageInput" 
-            className="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-8 rounded-xl transition-all mb-4"
+            className="cursor-pointer bg-white border-2 border-emerald-100 hover:bg-emerald-50 text-emerald-700 font-black py-4 px-10 rounded-2xl transition-all mb-6 shadow-sm active:scale-95 uppercase tracking-widest text-sm"
           >
             {image ? 'Change Photo' : 'Capture / Upload'}
           </label>
@@ -99,31 +99,44 @@ const DiseaseDetection: React.FC<DiseaseDetectionProps> = ({ language }) => {
           <button 
             disabled={!image || isAnalyzing}
             onClick={analyzeImage}
-            className={`w-full py-4 rounded-2xl text-white font-bold text-lg shadow-lg ${
-              !image || isAnalyzing ? 'bg-slate-300 cursor-not-allowed shadow-none' : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200'
+            className={`w-full py-5 rounded-[2rem] text-white font-black text-xl shadow-2xl transition-all transform ${
+              !image || isAnalyzing ? 'bg-slate-300 cursor-not-allowed shadow-none' : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20 active:scale-95'
             }`}
           >
-            {isAnalyzing ? 'Analyzing...' : `✨ ${t.analyze}`}
+            {isAnalyzing ? (
+              <span className="flex items-center justify-center gap-3">
+                <div className="w-6 h-6 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
+                Analyzing...
+              </span>
+            ) : `✨ ${t.analyze}`}
           </button>
         </div>
 
-        <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 min-h-[400px] flex flex-col">
-          <h3 className="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">
-            📝 {t.analysisResult}
+        <div className="bg-[#f9fbf9] p-10 rounded-[3rem] shadow-sm border border-emerald-50 min-h-[500px] flex flex-col relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+          
+          <h3 className="text-xl font-black text-slate-800 mb-8 border-b border-emerald-100 pb-4 flex items-center justify-between">
+            <span className="flex items-center gap-2">📝 {t.analysisResult}</span>
+            {analysis && <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-100 px-3 py-1 rounded-full">Gemini Verified</span>}
           </h3>
-          <div className="flex-grow prose prose-slate max-w-none">
+          
+          <div className="flex-grow">
             {isAnalyzing ? (
-              <div className="flex flex-col items-center justify-center h-full gap-4 text-slate-400">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
-                <p>Gemini AI is processing your image...</p>
+              <div className="flex flex-col items-center justify-center h-full gap-6 text-emerald-800/40">
+                <div className="relative">
+                  <div className="animate-spin rounded-full h-16 w-16 border-4 border-emerald-100 border-t-emerald-600"></div>
+                  <div className="absolute inset-0 flex items-center justify-center text-2xl font-black">🧠</div>
+                </div>
+                <p className="font-black uppercase tracking-widest text-xs animate-pulse">Deep scanning leaf tissues...</p>
               </div>
             ) : analysis ? (
-              <div className="text-slate-700 whitespace-pre-line text-sm leading-relaxed">
+              <div className="text-slate-800 whitespace-pre-line text-lg leading-relaxed bg-white/80 p-8 rounded-3xl border border-emerald-50 shadow-inner animate-in fade-in slide-in-from-bottom-4">
                 {analysis}
               </div>
             ) : (
-              <div className="flex items-center justify-center h-full text-slate-300 italic text-center px-10">
-                {t.placeholderResult}
+              <div className="flex flex-col items-center justify-center h-full text-slate-300 italic text-center px-12 space-y-6">
+                <div className="text-7xl opacity-20">📡</div>
+                <p className="font-bold text-slate-400 leading-tight">{t.placeholderResult}</p>
               </div>
             )}
           </div>

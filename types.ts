@@ -29,3 +29,11 @@ export interface RecommendationResult extends Crop {
   expectedRevenue: number;
   marketPotential: string;
 }
+
+export interface FarmReminder {
+  id: string;
+  time: string;
+  task: string;
+  isCompleted: boolean;
+  type: 'irrigation' | 'fertilizer' | 'harvest' | 'other';
+}

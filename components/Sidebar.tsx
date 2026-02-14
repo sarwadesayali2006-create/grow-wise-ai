@@ -20,19 +20,19 @@ const Sidebar: React.FC<SidebarProps> = ({ inputs, setInputs, onGetRecommendatio
   };
 
   return (
-    <div className="bg-white p-6 h-full border-r border-slate-200 flex flex-col">
+    <div className="bg-[#f2f7f4] p-6 h-full border-r border-emerald-100 flex flex-col shadow-inner">
       <div className="mb-8">
-        <h2 className="text-xl font-bold text-emerald-800 flex items-center gap-2">
-          ⚙️ {t.configuration}
+        <h2 className="text-xl font-black text-emerald-900 flex items-center gap-2 uppercase tracking-tight">
+          <span className="bg-emerald-200/50 p-1.5 rounded-lg">⚙️</span> {t.configuration}
         </h2>
-        <p className="text-sm text-slate-500 mt-1">{t.adjustFactors}</p>
+        <p className="text-sm text-emerald-700/70 mt-1 font-medium">{t.adjustFactors}</p>
       </div>
 
-      <div className="space-y-6 flex-grow overflow-y-auto">
+      <div className="space-y-6 flex-grow overflow-y-auto pr-2 custom-scrollbar">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">{t.language}</label>
+          <label className="block text-xs font-black text-emerald-800 uppercase tracking-widest mb-2">{t.language}</label>
           <select 
-            className="w-full bg-emerald-50 border border-emerald-200 text-emerald-900 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-2.5 font-bold"
+            className="w-full bg-white border-2 border-emerald-100 text-emerald-900 text-sm rounded-xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 block p-3 font-bold shadow-sm transition-all"
             value={language}
             onChange={(e) => setLanguage(e.target.value as Language)}
           >
@@ -42,9 +42,9 @@ const Sidebar: React.FC<SidebarProps> = ({ inputs, setInputs, onGetRecommendatio
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">{t.season}</label>
+          <label className="block text-xs font-black text-emerald-800 uppercase tracking-widest mb-2">{t.season}</label>
           <select 
-            className="w-full bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-2.5"
+            className="w-full bg-white border-2 border-emerald-100 text-slate-900 text-sm rounded-xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 block p-3 font-medium shadow-sm transition-all"
             value={inputs.season}
             onChange={(e) => handleChange('season', e.target.value as Season)}
           >
@@ -55,9 +55,9 @@ const Sidebar: React.FC<SidebarProps> = ({ inputs, setInputs, onGetRecommendatio
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">{t.soil}</label>
+          <label className="block text-xs font-black text-emerald-800 uppercase tracking-widest mb-2">{t.soil}</label>
           <select 
-            className="w-full bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-2.5"
+            className="w-full bg-white border-2 border-emerald-100 text-slate-900 text-sm rounded-xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 block p-3 font-medium shadow-sm transition-all"
             value={inputs.soil}
             onChange={(e) => handleChange('soil', e.target.value as Soil)}
           >
@@ -69,9 +69,9 @@ const Sidebar: React.FC<SidebarProps> = ({ inputs, setInputs, onGetRecommendatio
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">{t.water}</label>
+          <label className="block text-xs font-black text-emerald-800 uppercase tracking-widest mb-2">{t.water}</label>
           <select 
-            className="w-full bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-2.5"
+            className="w-full bg-white border-2 border-emerald-100 text-slate-900 text-sm rounded-xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 block p-3 font-medium shadow-sm transition-all"
             value={inputs.water}
             onChange={(e) => handleChange('water', e.target.value as Water)}
           >
@@ -82,11 +82,11 @@ const Sidebar: React.FC<SidebarProps> = ({ inputs, setInputs, onGetRecommendatio
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">{t.landSize}</label>
+          <label className="block text-xs font-black text-emerald-800 uppercase tracking-widest mb-2">{t.landSize}</label>
           <input 
             type="number"
             min="1"
-            className="w-full bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-2.5"
+            className="w-full bg-white border-2 border-emerald-100 text-slate-900 text-sm rounded-xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 block p-3 font-medium shadow-sm transition-all"
             value={inputs.landSize}
             onChange={(e) => handleChange('landSize', parseFloat(e.target.value) || 1)}
           />
@@ -94,31 +94,31 @@ const Sidebar: React.FC<SidebarProps> = ({ inputs, setInputs, onGetRecommendatio
 
         <button 
           onClick={onGetRecommendations}
-          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-lg transition-colors shadow-lg shadow-emerald-200 flex items-center justify-center gap-2"
+          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 px-4 rounded-2xl transition-all shadow-xl shadow-emerald-200 active:scale-95 flex items-center justify-center gap-2 mt-4"
         >
           🔍 {t.getRecommendations}
         </button>
 
-        <div className="mt-8 p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-          <h3 className="text-sm font-semibold text-emerald-800 flex items-center gap-2">
+        <div className="mt-8 p-5 bg-emerald-100/50 rounded-2xl border-2 border-emerald-200/50">
+          <h3 className="text-xs font-black text-emerald-900 uppercase tracking-widest flex items-center gap-2">
             💡 {t.scoringGuide}
           </h3>
-          <ul className="text-xs text-emerald-700 mt-2 space-y-1">
-            <li>• Season Match: +25 pts</li>
-            <li>• Soil/Water Match: +20 pts</li>
-            <li>• High Demand: Up to +30 pts</li>
-            <li>• Risk Penalty: Up to -10 pts</li>
+          <ul className="text-xs text-emerald-800 mt-3 space-y-2 font-bold">
+            <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> Season Match: +25 pts</li>
+            <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> Soil/Water Match: +20 pts</li>
+            <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> High Demand: Up to +30 pts</li>
+            <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> Risk Penalty: Up to -10 pts</li>
           </ul>
         </div>
       </div>
 
-      <div className="mt-auto pt-6 border-t border-slate-100">
+      <div className="mt-auto pt-6 border-t border-emerald-200/50">
         <button 
           onClick={onLogout}
-          className="w-full flex items-center justify-center gap-2 text-slate-400 hover:text-red-500 transition-colors text-sm font-semibold"
+          className="w-full flex items-center justify-center gap-2 text-emerald-600/60 hover:text-red-500 transition-all text-sm font-black uppercase tracking-widest"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
           {t.logout}
         </button>
