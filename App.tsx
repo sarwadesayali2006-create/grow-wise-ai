@@ -74,22 +74,6 @@ const App: React.FC = () => {
   const topThree = useMemo(() => recommendations.slice(0, 3), [recommendations]);
   const bestCrop = topThree[0];
 
-  const pieData = useMemo(() => {
-    if (!recommendations.length) return [];
-    const counts = recommendations.reduce((acc: any, curr) => {
-      const cat = curr.demandScore >= 8 ? t.strongExport : curr.demandScore >= 5 ? t.moderateGlobal : t.emergingMarket;
-      acc[cat] = (acc[cat] || 0) + 1;
-      return acc;
-    }, {});
-    
-    return Object.keys(counts).map(name => ({
-      name,
-      value: counts[name]
-    }));
-  }, [recommendations, language]);
-
-  const PIE_COLORS = ['#10b981', '#6366f1', '#94a3b8'];
-
   if (!isLoggedIn) {
     return <Login onLogin={() => setIsLoggedIn(true)} />;
   }
@@ -112,28 +96,40 @@ const App: React.FC = () => {
       <main className="flex-grow p-4 md:p-8 overflow-y-auto">
         {/* Navigation Tabs + Notification Center */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-10">
-          <div className="flex flex-wrap gap-2 md:gap-4 bg-[#f1f6f2] p-2 rounded-3xl border border-emerald-100/50 w-fit shadow-inner">
+          <div className="flex flex-wrap gap-2 md:gap-4 bg-[#f1f6f2] p-2 rounded-3xl border border-emerald-100/50 w-full md:w-fit shadow-inner">
             <button 
               onClick={() => setActiveTab('advisor')}
-              className={`px-5 py-3 rounded-2xl font-black transition-all text-xs md:text-sm uppercase tracking-wider ${activeTab === 'advisor' ? 'bg-emerald-600 text-white shadow-xl scale-105' : 'text-emerald-700/60 hover:bg-emerald-100/50'}`}
+              className={`flex-grow md:flex-none px-5 py-3 rounded-2xl font-black transition-all text-xs md:text-sm uppercase tracking-wider ${activeTab === 'advisor' ? 'bg-emerald-600 text-white shadow-xl scale-105' : 'text-emerald-700/60 hover:bg-emerald-100/50'}`}
             >
               🌾 {t.navAdvisor}
             </button>
             <button 
               onClick={() => setActiveTab('personal')}
-              className={`px-5 py-3 rounded-2xl font-black transition-all text-xs md:text-sm uppercase tracking-wider ${activeTab === 'personal' ? 'bg-emerald-600 text-white shadow-xl scale-105' : 'text-emerald-700/60 hover:bg-emerald-100/50'}`}
+              className={`flex-grow md:flex-none px-5 py-3 rounded-2xl font-black transition-all text-xs md:text-sm uppercase tracking-wider ${activeTab === 'personal' ? 'bg-emerald-600 text-white shadow-xl scale-105' : 'text-emerald-700/60 hover:bg-emerald-100/50'}`}
             >
               🎯 {t.navPersonal}
             </button>
             <button 
+              onClick={() => setActiveTab('assistant')}
+              className={`flex-grow md:flex-none px-5 py-3 rounded-2xl font-black transition-all text-xs md:text-sm uppercase tracking-wider ${activeTab === 'assistant' ? 'bg-emerald-600 text-white shadow-xl scale-105' : 'text-emerald-700/60 hover:bg-emerald-100/50'}`}
+            >
+              🎙️ {t.navAssistant}
+            </button>
+            <button 
+              onClick={() => setActiveTab('weather')}
+              className={`flex-grow md:flex-none px-5 py-3 rounded-2xl font-black transition-all text-xs md:text-sm uppercase tracking-wider ${activeTab === 'weather' ? 'bg-emerald-600 text-white shadow-xl scale-105' : 'text-emerald-700/60 hover:bg-emerald-100/50'}`}
+            >
+              🌤️ {t.navWeather}
+            </button>
+            <button 
               onClick={() => setActiveTab('monitor')}
-              className={`px-5 py-3 rounded-2xl font-black transition-all text-xs md:text-sm uppercase tracking-wider ${activeTab === 'monitor' ? 'bg-emerald-600 text-white shadow-xl scale-105' : 'text-emerald-700/60 hover:bg-emerald-100/50'}`}
+              className={`flex-grow md:flex-none px-5 py-3 rounded-2xl font-black transition-all text-xs md:text-sm uppercase tracking-wider ${activeTab === 'monitor' ? 'bg-emerald-600 text-white shadow-xl scale-105' : 'text-emerald-700/60 hover:bg-emerald-100/50'}`}
             >
               📊 {t.navMonitoring}
             </button>
             <button 
               onClick={() => setActiveTab('disease')}
-              className={`px-5 py-3 rounded-2xl font-black transition-all text-xs md:text-sm uppercase tracking-wider ${activeTab === 'disease' ? 'bg-emerald-600 text-white shadow-xl scale-105' : 'text-emerald-700/60 hover:bg-emerald-100/50'}`}
+              className={`flex-grow md:flex-none px-5 py-3 rounded-2xl font-black transition-all text-xs md:text-sm uppercase tracking-wider ${activeTab === 'disease' ? 'bg-emerald-600 text-white shadow-xl scale-105' : 'text-emerald-700/60 hover:bg-emerald-100/50'}`}
             >
               🔍 {t.navDetection}
             </button>
@@ -152,28 +148,18 @@ const App: React.FC = () => {
           </button>
         </div>
 
-        {/* Dynamic Header */}
-        <div className="mb-10">
-          <div className="flex items-center gap-4 mb-3">
-            <span className="text-5xl bg-emerald-100 p-3 rounded-[2rem] shadow-sm transform hover:rotate-6 transition-transform">
-              {activeTab === 'advisor' ? '🌾' : activeTab === 'personal' ? '🎯' : activeTab === 'monitor' ? '🛰️' : activeTab === 'disease' ? '🧠' : activeTab === 'notifications' ? '📋' : activeTab === 'weather' ? '🌤️' : '🤖'}
-            </span>
-            <div>
-              <h1 className="text-4xl font-black text-slate-900 tracking-tighter">
-                {t.title} <span className="text-emerald-600">/ {activeTab === 'advisor' ? t.subtitle : activeTab === 'personal' ? t.navPersonal : activeTab === 'monitor' ? t.navMonitoring : activeTab === 'disease' ? t.navDetection : activeTab === 'notifications' ? t.reminders : activeTab === 'weather' ? t.weatherForecast : t.navAssistant}</span>
-              </h1>
-              <p className="text-slate-500 text-lg font-medium max-w-2xl mt-1">
-                {activeTab === 'notifications' ? t.activeNotifications : t.description}
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* Content Router */}
         <div className="perspective-1000">
           {activeTab === 'advisor' && (
             <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-              {/* ... (advisor content unchanged) ... */}
+              <div className="mb-10 flex items-center gap-4">
+                 <span className="text-5xl bg-emerald-100 p-3 rounded-[2rem] shadow-sm transform hover:rotate-6 transition-transform">🌾</span>
+                 <div>
+                    <h1 className="text-4xl font-black text-slate-900 tracking-tighter">{t.navAdvisor}</h1>
+                    <p className="text-slate-500 font-medium">{t.description}</p>
+                 </div>
+              </div>
+
               {!hasSearched ? (
                 <div className="flex flex-col items-center justify-center py-24 bg-[#f9fbf9] rounded-[3rem] border-4 border-dashed border-emerald-100 shadow-inner">
                   <div className="text-8xl mb-8 opacity-20 transform -rotate-12 animate-float">🚜</div>
@@ -222,13 +208,20 @@ const App: React.FC = () => {
           )}
 
           {activeTab === 'personal' && <PersonalRecommendation language={language} onAddReminder={addReminder} />}
+          {activeTab === 'assistant' && <VoiceAssistant language={language} />}
+          {activeTab === 'weather' && <WeatherSection language={language} />}
           {activeTab === 'monitor' && <FieldMonitoring language={language} />}
           {activeTab === 'disease' && <DiseaseDetection language={language} />}
-          {activeTab === 'weather' && <WeatherSection language={language} />}
-          {activeTab === 'assistant' && <VoiceAssistant language={language} />}
           
           {activeTab === 'notifications' && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
+               <div className="mb-10 flex items-center gap-4">
+                 <span className="text-5xl bg-emerald-100 p-3 rounded-[2rem] shadow-sm">📋</span>
+                 <div>
+                    <h1 className="text-4xl font-black text-slate-900 tracking-tighter">{t.reminders}</h1>
+                    <p className="text-slate-500 font-medium">{t.activeNotifications}</p>
+                 </div>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {reminders.length === 0 ? (
                   <div className="col-span-full py-20 bg-[#f9fbf9] rounded-[3rem] border-4 border-dashed border-emerald-100 flex flex-col items-center justify-center text-center px-10">
