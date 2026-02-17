@@ -39,9 +39,14 @@ const PersonalRecommendation: React.FC<PersonalRecommendationProps> = ({ languag
     
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const prompt = personalLang === 'hi'
-        ? `मैं ${state} का एक किसान हूँ। मेरी मिट्टी का इतिहास: ${soilHistory}। वर्ष ${burnYear} में मेरी फसल जल गई थी या विफल हो गई थी। मुझे भविष्य के लिए एक व्यक्तिगत कृषि रणनीति बताएं, जिसमें मिट्टी की उर्वरता बहाल करने और सर्वोत्तम अगली फसल के सुझाव शामिल हों। हिंदी में जवाब दें और महत्वपूर्ण बिन्दुओं को बुलेट्स में लिखें।`
-        : `I am a farmer from ${state}. Soil history: ${soilHistory}. In year ${burnYear}, my crop was burned/failed. Provide a personalized agricultural strategy for the future, including soil recovery tips and best next crop suggestions. Use bullet points and speak in English.`;
+      let prompt = "";
+      if (personalLang === 'hi') {
+        prompt = `मैं ${state} का एक किसान हूँ। मेरी मिट्टी का इतिहास: ${soilHistory}। वर्ष ${burnYear} में मेरी फसल जल गई थी या विफल हो गई थी। मुझे भविष्य के लिए एक व्यक्तिगत कृषि रणनीति बताएं, जिसमें मिट्टी की उर्वरता बहाल करने और सर्वोत्तम अगली फसल के सुझाव शामिल हों। हिंदी में जवाब दें और महत्वपूर्ण बिन्दुओं को बुलेट्स में लिखें।`;
+      } else if (personalLang === 'mr') {
+        prompt = `मी ${state} मधील शेतकरी आहे. माझ्या मातीचा इतिहास: ${soilHistory}. वर्ष ${burnYear} मध्ये माझे पीक जळाले किंवा निकामी झाले होते. भविष्यासाठी मला वैयक्तिकृत कृषी धोरण सांगा, ज्यामध्ये मातीची सुपीकता पुनर्संचयित करण्यासाठी टिप्स आणि सर्वोत्तम पुढील पिकाच्या शिफारसींचा समावेश असेल. मराठीत उत्तर द्या आणि महत्त्वाचे मुद्दे बुलेट्समध्ये लिहा.`;
+      } else {
+        prompt = `I am a farmer from ${state}. Soil history: ${soilHistory}. In year ${burnYear}, my crop was burned/failed. Provide a personalized agricultural strategy for the future, including soil recovery tips and best next crop suggestions. Use bullet points and speak in English.`;
+      }
 
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
@@ -71,7 +76,8 @@ const PersonalRecommendation: React.FC<PersonalRecommendationProps> = ({ languag
     onAddReminder(newReminder);
     setAlarmTime('');
     setAlarmTask('');
-    alert(personalLang === 'hi' ? 'अलार्म सेट हो गया!' : 'Farm alarm set successfully!');
+    const successMsg = personalLang === 'hi' ? 'अलार्म सेट हो गया!' : personalLang === 'mr' ? 'अलार्म सेट झाला!' : 'Farm alarm set successfully!';
+    alert(successMsg);
   };
 
   return (
@@ -86,15 +92,21 @@ const PersonalRecommendation: React.FC<PersonalRecommendationProps> = ({ languag
         <div className="flex items-center bg-[#f1f6f2] p-1.5 rounded-2xl shadow-inner border border-emerald-50">
           <button 
             onClick={() => setPersonalLang('en')}
-            className={`px-6 py-2 rounded-xl text-sm font-black transition-all ${personalLang === 'en' ? 'bg-slate-900 text-white shadow-lg scale-105' : 'text-emerald-700/60 hover:text-emerald-900'}`}
+            className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${personalLang === 'en' ? 'bg-slate-900 text-white shadow-lg scale-105' : 'text-emerald-700/60 hover:text-emerald-900'}`}
           >
             English
           </button>
           <button 
             onClick={() => setPersonalLang('hi')}
-            className={`px-6 py-2 rounded-xl text-sm font-black transition-all ${personalLang === 'hi' ? 'bg-slate-900 text-white shadow-lg scale-105' : 'text-emerald-700/60 hover:text-emerald-900'}`}
+            className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${personalLang === 'hi' ? 'bg-slate-900 text-white shadow-lg scale-105' : 'text-emerald-700/60 hover:text-emerald-900'}`}
           >
             हिन्दी
+          </button>
+          <button 
+            onClick={() => setPersonalLang('mr')}
+            className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${personalLang === 'mr' ? 'bg-slate-900 text-white shadow-lg scale-105' : 'text-emerald-700/60 hover:text-emerald-900'}`}
+          >
+            मराठी
           </button>
         </div>
       </div>
@@ -106,7 +118,7 @@ const PersonalRecommendation: React.FC<PersonalRecommendationProps> = ({ languag
           
           <div className="relative z-10 space-y-8">
             <h3 className="text-emerald-400 font-black text-xs uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
-               📝 {personalLang === 'hi' ? 'विवरण भरें' : 'Fill Details'}
+               📝 {personalLang === 'hi' ? 'विवरण भरें' : personalLang === 'mr' ? 'तपशील भरा' : 'Fill Details'}
             </h3>
 
             <div>

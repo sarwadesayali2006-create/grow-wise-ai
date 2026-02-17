@@ -100,6 +100,8 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ language: initialLangua
       const source = audioContextRef.current.createMediaStreamSource(stream);
       const scriptProcessor = audioContextRef.current.createScriptProcessor(4096, 1, 1);
 
+      const targetLangName = voiceLanguage === 'hi' ? 'Hindi' : voiceLanguage === 'mr' ? 'Marathi' : 'English';
+
       const sessionPromise = ai.live.connect({
         model: 'gemini-2.5-flash-native-audio-preview-12-2025',
         callbacks: {
@@ -149,7 +151,7 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ language: initialLangua
           speechConfig: {
             voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } },
           },
-          systemInstruction: `You are GrowWise, a world-class agricultural expert. Speak in ${voiceLanguage === 'hi' ? 'Hindi' : 'English'}. Assist with soil, pests, and crops. Be concise.`,
+          systemInstruction: `You are GrowWise, a world-class agricultural expert. Speak in ${targetLangName}. Assist with soil, pests, and crops. Be concise.`,
           inputAudioTranscription: {},
           outputAudioTranscription: {}
         }
@@ -178,7 +180,7 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ language: initialLangua
           <button 
             disabled={isActive}
             onClick={() => setVoiceLanguage('en')}
-            className={`px-8 py-3 rounded-xl text-xs font-black transition-all uppercase tracking-widest ${
+            className={`px-6 py-3 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest ${
               voiceLanguage === 'en' 
                 ? 'bg-emerald-600 text-white shadow-[0_10px_20px_-5px_rgba(16,185,129,0.4)] scale-105' 
                 : 'text-emerald-700/60 hover:text-emerald-800'
@@ -189,13 +191,24 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ language: initialLangua
           <button 
             disabled={isActive}
             onClick={() => setVoiceLanguage('hi')}
-            className={`px-8 py-3 rounded-xl text-xs font-black transition-all uppercase tracking-widest ${
+            className={`px-6 py-3 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest ${
               voiceLanguage === 'hi' 
                 ? 'bg-emerald-600 text-white shadow-[0_10px_20px_-5px_rgba(16,185,129,0.4)] scale-105' 
                 : 'text-emerald-700/60 hover:text-emerald-800'
             } ${isActive ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             हिन्दी
+          </button>
+          <button 
+            disabled={isActive}
+            onClick={() => setVoiceLanguage('mr')}
+            className={`px-6 py-3 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest ${
+              voiceLanguage === 'mr' 
+                ? 'bg-emerald-600 text-white shadow-[0_10px_20px_-5px_rgba(16,185,129,0.4)] scale-105' 
+                : 'text-emerald-700/60 hover:text-emerald-800'
+            } ${isActive ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            मराठी
           </button>
         </div>
       </div>
@@ -226,12 +239,14 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ language: initialLangua
           </div>
 
           <div className="space-y-4 transform translate-z-10">
-            <h3 className="text-3xl font-black text-slate-800 tracking-tighter">{voiceLanguage === 'en' ? 'Live Voice Core' : 'लाइव वॉयस कोर'}</h3>
+            <h3 className="text-3xl font-black text-slate-800 tracking-tighter">
+               {voiceLanguage === 'en' ? 'Live Voice Core' : voiceLanguage === 'hi' ? 'लाइव वॉयस कोर' : 'लाइव्ह व्हॉइस कोअर'}
+            </h3>
             <p className="text-slate-500 font-medium max-w-xs mx-auto leading-relaxed">{t.voiceInstruction}</p>
             <div className="inline-flex items-center gap-2 bg-white px-6 py-2 rounded-full border border-emerald-50 shadow-sm">
                <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em]">
-                 {voiceLanguage === 'en' ? 'Gemini 2.5 Native Audio' : 'जेमिनी 2.5 नेटिव ऑडियो'}
+                 {voiceLanguage === 'en' ? 'Gemini 2.5 Native Audio' : voiceLanguage === 'hi' ? 'जेमिनी 2.5 नेटिव ऑडियो' : 'जेमिनी २.५ नेटिव्ह ऑडिओ'}
                </span>
             </div>
           </div>
@@ -242,7 +257,7 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ language: initialLangua
           
           <div className="flex items-center justify-between mb-10 border-b border-emerald-100/50 pb-6 relative z-10">
             <h3 className="text-xl font-black text-slate-800 flex items-center gap-3">
-              <span className="text-emerald-600">📝</span> {voiceLanguage === 'en' ? 'Live Transcript' : 'लाइव ट्रांसक्रिप्ट'}
+              <span className="text-emerald-600">📝</span> {voiceLanguage === 'en' ? 'Live Transcript' : voiceLanguage === 'hi' ? 'लाइव ट्रांसक्रिप्ट' : 'लाइव्ह ट्रान्सक्रिप्ट'}
             </h3>
             {isActive && (
                <span className="text-[10px] font-black text-emerald-600 bg-emerald-100 px-4 py-1.5 rounded-full animate-pulse uppercase tracking-widest">
@@ -262,7 +277,7 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ language: initialLangua
                 {transcript.length === 0 ? (
                   <div className="text-center py-20">
                      <p className="text-emerald-800/40 italic font-black uppercase tracking-widest animate-pulse">
-                        {voiceLanguage === 'en' ? 'Awaiting your command...' : 'आपके आदेश की प्रतीक्षा है...'}
+                        {voiceLanguage === 'en' ? 'Awaiting your command...' : voiceLanguage === 'hi' ? 'आपके आदेश की प्रतीक्षा है...' : 'तुमच्या आदेशाची प्रतीक्षा आहे...'}
                      </p>
                   </div>
                 ) : (

@@ -38,6 +38,7 @@ const Sidebar: React.FC<SidebarProps> = ({ inputs, setInputs, onGetRecommendatio
           >
             <option value="en">English</option>
             <option value="hi">हिन्दी (Hindi)</option>
+            <option value="mr">मराठी (Marathi)</option>
           </select>
         </div>
 
