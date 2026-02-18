@@ -14,18 +14,27 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ language: initialLangua
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [transcript, setTranscript] = useState<string[]>([]);
+  const [chatInput, setChatInput] = useState('');
+  const [isChatLoading, setIsChatLoading] = useState(false);
   
   const audioContextRef = useRef<AudioContext | null>(null);
   const outputAudioContextRef = useRef<AudioContext | null>(null);
   const sessionRef = useRef<any>(null);
   const nextStartTimeRef = useRef<number>(0);
   const sourcesRef = useRef<Set<AudioBufferSourceNode>>(new Set());
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isActive) {
       setVoiceLanguage(initialLanguage);
     }
   }, [initialLanguage, isActive]);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [transcript]);
 
   const encode = (bytes: Uint8Array) => {
     let binary = '';
@@ -113,11 +122,11 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ language: initialLangua
           onmessage: async (message: LiveServerMessage) => {
             if (message.serverContent?.inputTranscription) {
               const text = message.serverContent.inputTranscription.text;
-              setTranscript(prev => [...prev.slice(-4), `👨‍🌾: ${text}`]);
+              setTranscript(prev => [...prev.slice(-20), `👨‍🌾: ${text}`]);
             }
             if (message.serverContent?.outputTranscription) {
               const text = message.serverContent.outputTranscription.text;
-              setTranscript(prev => [...prev.slice(-4), `🤖: ${text}`]);
+              setTranscript(prev => [...prev.slice(-20), `🤖: ${text}`]);
             }
 
             const audioData = message.serverContent?.modelTurn?.parts[0]?.inlineData?.data;
@@ -151,7 +160,7 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ language: initialLangua
           speechConfig: {
             voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } },
           },
-          systemInstruction: `You are GrowWise, a world-class agricultural expert. Speak in ${targetLangName}. Assist with soil, pests, and crops. Be concise.`,
+          systemInstruction: `You are GrowWise, a world-class agricultural expert. Speak in ${targetLangName}. Assist with soil, pests, and crops. Be concise. Respond both in text and audio.`,
           inputAudioTranscription: {},
           outputAudioTranscription: {}
         }
@@ -167,15 +176,43 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ language: initialLangua
     } catch (err) { console.error(err); stopConversation(); }
   };
 
+  const handleSendChat = async (text: string = chatInput) => {
+    if (!text.trim()) return;
+    const userMsg = `👨‍🌾: ${text}`;
+    setTranscript(prev => [...prev.slice(-20), userMsg]);
+    setChatInput('');
+    setIsChatLoading(true);
+
+    try {
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const targetLangName = voiceLanguage === 'hi' ? 'Hindi' : voiceLanguage === 'mr' ? 'Marathi' : 'English';
+      
+      const response = await ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: text,
+        config: {
+          systemInstruction: `You are GrowWise, a world-class agricultural expert. Answer in ${targetLangName}. Be helpful and concise.`,
+        }
+      });
+
+      const aiMsg = `🤖: ${response.text}`;
+      setTranscript(prev => [...prev.slice(-20), aiMsg]);
+    } catch (err) {
+      console.error(err);
+      setTranscript(prev => [...prev, "🤖: Error processing your request."]);
+    } finally {
+      setIsChatLoading(false);
+    }
+  };
+
   return (
-    <div className="space-y-10 animate-in fade-in duration-500">
+    <div className="space-y-10 animate-in fade-in duration-500 pb-10">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <h2 className="text-4xl font-black text-slate-900 flex items-center gap-4 tracking-tighter">
           <span className="bg-emerald-100 p-3 rounded-3xl shadow-lg transform hover:rotate-12 transition-transform">🎙️</span> 
           {t.voiceAssistantTitle}
         </h2>
         
-        {/* Language Selection Toggle */}
         <div className="flex items-center bg-[#f1f6f2] p-1.5 rounded-2xl border border-emerald-50 shadow-inner perspective-1000">
           <button 
             disabled={isActive}
@@ -214,11 +251,11 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ language: initialLangua
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        <div className="bg-[#f9fbf9] rounded-[4rem] p-16 shadow-2xl border border-emerald-50 flex flex-col items-center text-center space-y-12 relative overflow-hidden group perspective-1000">
+        {/* Left Section: Live Visuals */}
+        <div className="bg-[#f9fbf9] rounded-[4rem] p-12 shadow-2xl border border-emerald-50 flex flex-col items-center text-center space-y-12 relative overflow-hidden group perspective-1000 min-h-[500px] justify-center">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.05),transparent)] pointer-events-none"></div>
           
           <div className="relative">
-            {/* 3D Pulsing Orb */}
             <div className={`absolute inset-0 bg-emerald-500 rounded-full opacity-20 blur-3xl transition-all duration-1000 ${isActive ? 'animate-pulse scale-150' : 'scale-0'}`}></div>
             <button 
               onClick={isActive ? stopConversation : startConversation}
@@ -240,7 +277,7 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ language: initialLangua
 
           <div className="space-y-4 transform translate-z-10">
             <h3 className="text-3xl font-black text-slate-800 tracking-tighter">
-               {voiceLanguage === 'en' ? 'Live Voice Core' : voiceLanguage === 'hi' ? 'लाइव वॉयस कोर' : 'लाइव्ह व्हॉइस कोअर'}
+               {voiceLanguage === 'en' ? 'Live Voice' : voiceLanguage === 'hi' ? 'लाइव वॉयस' : 'लाइव्ह व्हॉइस'}
             </h3>
             <p className="text-slate-500 font-medium max-w-xs mx-auto leading-relaxed">{t.voiceInstruction}</p>
             <div className="inline-flex items-center gap-2 bg-white px-6 py-2 rounded-full border border-emerald-50 shadow-sm">
@@ -252,12 +289,14 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ language: initialLangua
           </div>
         </div>
 
-        <div className="bg-[#f9fbf9] rounded-[4rem] p-12 shadow-sm border border-emerald-50 flex flex-col min-h-[500px] group overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-emerald-500/10 transition-all duration-1000"></div>
+        {/* Right Section: Chat & Transcript Hub */}
+        <div className="bg-white rounded-[4rem] shadow-xl border border-emerald-50 flex flex-col h-[650px] group overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full -mr-32 -mt-32 blur-3xl pointer-events-none"></div>
           
-          <div className="flex items-center justify-between mb-10 border-b border-emerald-100/50 pb-6 relative z-10">
+          {/* Header */}
+          <div className="px-10 py-8 border-b border-emerald-100/50 flex items-center justify-between shrink-0">
             <h3 className="text-xl font-black text-slate-800 flex items-center gap-3">
-              <span className="text-emerald-600">📝</span> {voiceLanguage === 'en' ? 'Live Transcript' : voiceLanguage === 'hi' ? 'लाइव ट्रांसक्रिप्ट' : 'लाइव्ह ट्रान्सक्रिप्ट'}
+              <span className="text-emerald-600 text-2xl">✨</span> {voiceLanguage === 'en' ? 'Conversational Hub' : voiceLanguage === 'hi' ? 'संवाद केंद्र' : 'संवाद केंद्र'}
             </h3>
             {isActive && (
                <span className="text-[10px] font-black text-emerald-600 bg-emerald-100 px-4 py-1.5 rounded-full animate-pulse uppercase tracking-widest">
@@ -266,45 +305,82 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ language: initialLangua
             )}
           </div>
 
-          <div className="flex-grow flex flex-col justify-center space-y-6 relative z-10">
-            {!isActive ? (
-              <div className="flex flex-col items-center justify-center text-center space-y-8 opacity-30 group-hover:opacity-50 transition-opacity">
-                <div className="text-8xl transform -rotate-12 group-hover:rotate-0 transition-transform">🤖</div>
-                <p className="text-2xl font-black text-emerald-900 uppercase tracking-tighter">{t.voiceStart}</p>
+          {/* Transcript/Message Area */}
+          <div 
+            ref={scrollRef}
+            className="flex-grow p-10 overflow-y-auto space-y-6 scroll-smooth custom-scrollbar"
+          >
+            {transcript.length === 0 && !isChatLoading ? (
+              <div className="h-full flex flex-col items-center justify-center text-center space-y-8 opacity-30">
+                <div className="text-7xl transform -rotate-12">🚜</div>
+                <p className="text-xl font-black text-emerald-900 uppercase tracking-tighter">{voiceLanguage === 'en' ? 'Start chatting or speaking' : 'बातचीत शुरू करें'}</p>
               </div>
             ) : (
-              <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4">
-                {transcript.length === 0 ? (
-                  <div className="text-center py-20">
-                     <p className="text-emerald-800/40 italic font-black uppercase tracking-widest animate-pulse">
-                        {voiceLanguage === 'en' ? 'Awaiting your command...' : voiceLanguage === 'hi' ? 'आपके आदेश की प्रतीक्षा है...' : 'तुमच्या आदेशाची प्रतीक्षा आहे...'}
-                     </p>
-                  </div>
-                ) : (
-                  transcript.map((line, i) => (
-                    <div key={i} className={`flex ${line.startsWith('👨‍🌾') ? 'justify-start' : 'justify-end'} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
-                      <div className={`max-w-[85%] p-6 rounded-[2rem] shadow-sm border-2 ${
-                        line.startsWith('👨‍🌾') 
-                          ? 'bg-white border-emerald-50 text-slate-600 font-bold' 
-                          : 'bg-emerald-600 border-emerald-500 text-white font-black shadow-lg shadow-emerald-500/10'
-                      }`}>
-                        {line}
-                      </div>
+              <>
+                {transcript.map((line, i) => (
+                  <div key={i} className={`flex ${line.startsWith('👨‍🌾') ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
+                    <div className={`max-w-[85%] p-5 rounded-[2rem] shadow-sm border-2 ${
+                      line.startsWith('👨‍🌾') 
+                        ? 'bg-slate-900 border-slate-800 text-white font-bold' 
+                        : 'bg-emerald-50 border-emerald-100 text-slate-800 font-medium'
+                    }`}>
+                      {line.replace(/👨‍🌾:|🤖:/, '').trim()}
                     </div>
-                  ))
+                  </div>
+                ))}
+                {isChatLoading && (
+                  <div className="flex justify-start animate-pulse">
+                    <div className="bg-emerald-50 p-5 rounded-[2rem] border-2 border-emerald-100 flex gap-2">
+                       <span className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce"></span>
+                       <span className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                       <span className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                    </div>
+                  </div>
                 )}
-              </div>
+              </>
             )}
           </div>
 
-          {isActive && (
-            <button 
-              onClick={stopConversation}
-              className="mt-10 py-4 bg-red-50 text-red-500 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-red-500 hover:text-white transition-all shadow-sm relative z-10"
-            >
-              {t.voiceStop}
-            </button>
-          )}
+          {/* Interaction Area (Quick Chips + Input) */}
+          <div className="p-8 bg-[#fcfdfa] border-t border-emerald-100/50 space-y-4 shrink-0">
+            {/* Quick Action Chips */}
+            <div className="flex gap-2 overflow-x-auto pb-2 scroll-hide">
+              {[t.pestControl, t.soilHealth, t.cropPrice].map((chip) => (
+                <button 
+                  key={chip}
+                  onClick={() => handleSendChat(chip)}
+                  className="whitespace-now8 py-2 px-4 bg-white border border-emerald-100 rounded-full text-[10px] font-black text-emerald-700 hover:bg-emerald-600 hover:text-white transition-all shadow-sm active:scale-95 shrink-0"
+                >
+                  {chip}
+                </button>
+              ))}
+            </div>
+
+            {/* Chat Input Field */}
+            <div className="relative flex items-center gap-3">
+              <input 
+                type="text" 
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendChat()}
+                placeholder={t.chatPlaceholder}
+                className="w-full bg-white border-2 border-emerald-100/50 px-6 py-5 rounded-3xl outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 transition-all font-bold text-slate-800 shadow-inner"
+              />
+              <button 
+                onClick={() => handleSendChat()}
+                disabled={!chatInput.trim() || isChatLoading}
+                className={`p-5 rounded-3xl shadow-xl transition-all active:scale-90 ${
+                  !chatInput.trim() || isChatLoading 
+                    ? 'bg-slate-100 text-slate-300' 
+                    : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-500/20'
+                }`}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 transform rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

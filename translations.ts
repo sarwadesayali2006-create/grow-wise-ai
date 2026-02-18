@@ -95,7 +95,13 @@ export const translations = {
     noNotifications: "No active farm tasks.",
     taskCompleted: "Task Completed",
     reminders: "Farm Reminders",
-    smartScheduling: "Smart Scheduling"
+    smartScheduling: "Smart Scheduling",
+    chatPlaceholder: "Type your query here...",
+    send: "Send",
+    quickAsk: "Quick Ask",
+    pestControl: "Pest Control",
+    soilHealth: "Soil Health",
+    cropPrice: "Market Prices"
   },
   hi: {
     title: "ग्रोवाइज़ (GrowWise)",
@@ -192,7 +198,13 @@ export const translations = {
     noNotifications: "कोई सक्रिय कार्य नहीं है।",
     taskCompleted: "कार्य पूर्ण",
     reminders: "खेती के रिमाइंडर",
-    smartScheduling: "स्मार्ट शेड्यूलिंग"
+    smartScheduling: "स्मार्ट शेड्यूलिंग",
+    chatPlaceholder: "अपनी शंका यहाँ लिखें...",
+    send: "भेजें",
+    quickAsk: "त्वरित प्रश्न",
+    pestControl: "कीट नियंत्रण",
+    soilHealth: "मिट्टी का स्वास्थ्य",
+    cropPrice: "बाजार मूल्य"
   },
   mr: {
     title: "ग्रोवाइज़ (GrowWise)",
@@ -289,7 +301,13 @@ export const translations = {
     noNotifications: "कोणतीही सक्रिय शेती कामे नाहीत.",
     taskCompleted: "काम पूर्ण झाले",
     reminders: "शेती स्मरणपत्रे",
-    smartScheduling: "स्मार्ट शेड्यूलिंग"
+    smartScheduling: "स्मार्ट शेड्यूलिंग",
+    chatPlaceholder: "तुमची शंका इथे लिहा...",
+    send: "पाठवा",
+    quickAsk: "त्वरित प्रश्न",
+    pestControl: "कीटक नियंत्रण",
+    soilHealth: "मातीचे आरोग्य",
+    cropPrice: "बाजार भाव"
   }
 };
 
