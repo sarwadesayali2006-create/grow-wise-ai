@@ -202,6 +202,56 @@ const App: React.FC = () => {
                       ))}
                     </div>
                   </div>
+
+                  {/* Prediction Accuracy Section */}
+                  <div className="bg-white p-6 md:p-10 rounded-[3rem] shadow-xl border border-emerald-50">
+                    <h2 className="text-2xl font-black text-slate-900 mb-8 flex items-center gap-3">
+                      <span className="bg-emerald-100 p-2 rounded-xl">🎯</span> {t.predictionAccuracy}
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                      {topThree.map((crop) => {
+                        const score = Math.min(100, Math.max(0, crop.score));
+                        const data = [
+                          { name: 'Confidence', value: score },
+                          { name: 'Other', value: 100 - score }
+                        ];
+                        const COLORS = ['#10b981', '#f1f5f9'];
+
+                        return (
+                          <div key={`accuracy-${crop.id}`} className="flex flex-col items-center p-6 bg-[#fcfdfa] rounded-[2rem] border border-emerald-50 shadow-inner relative">
+                            <div className="w-full h-48 relative">
+                              <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                  <Pie
+                                    data={data}
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={60}
+                                    outerRadius={80}
+                                    paddingAngle={5}
+                                    dataKey="value"
+                                    startAngle={90}
+                                    endAngle={-270}
+                                    stroke="none"
+                                  >
+                                    {data.map((entry, index) => (
+                                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                  </Pie>
+                                  <Tooltip />
+                                </PieChart>
+                              </ResponsiveContainer>
+                              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                <span className="text-2xl font-black text-emerald-600">{score}%</span>
+                                <span className="text-[10px] uppercase font-bold text-slate-400">{t.confidenceLevel}</span>
+                              </div>
+                            </div>
+                            <h3 className="mt-4 text-lg font-black text-slate-800">{crop.name}</h3>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
